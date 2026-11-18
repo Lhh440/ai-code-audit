@@ -9,6 +9,8 @@ A new rule must earn its false-positive budget. Add the fixture first:
 3. Run `evals/run.sh` — it must fail.
 4. Implement, until it passes.
 5. Run `evals/run.sh` again: `clean-*` fixtures must stay green.
+6. Probe behavior changes also run `evals/credibility.sh`; every script must
+   answer `--help` without running a tool.
 
 If a rule fires on `clean-unusual` or `clean-types`, either narrow it or add
 the counter-example there so the FP stays visible.

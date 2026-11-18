@@ -145,8 +145,9 @@ def scan(path: str) -> list[_lib.Finding]:
         pattern = re.compile(pattern.pattern, pattern.flags | re.M)
         if flags and "notest" in flags[0] and in_test:
             continue
-        for match in pattern.finditer(cleaned):
-            line = cleaned.count("\n", 0, match.start()) + 1
+        haystack = source if rule.endswith("-comment") or rule == "todo" else cleaned
+        for match in pattern.finditer(haystack):
+            line = haystack.count("\n", 0, match.start()) + 1
             findings.append(_lib.Finding(
                 rule=rule, severity=severity, file=_lib.rel(path), line=line, message=message,
                 evidence=lines[line - 1].strip()[:160] if line <= len(lines) else "",

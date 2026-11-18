@@ -1,6 +1,6 @@
 {
   "name": "ai-code-audit",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Audit AI-generated code: hallucinated APIs, weakened tests, optimistic paths, fake completeness. Python, TypeScript, Go, Rust.",
   "keywords": [
     "pi-package",

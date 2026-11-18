@@ -25,11 +25,11 @@ NEAR_MISS_RATIO = 0.82
 # (rule, severity, pattern, message, flags)
 RULES = [
     ("ts-nocheck", "MAJOR", re.compile(r"//\s*@ts-nocheck"),
-     "whole file opted out of type checking", ()),
+     "whole file opted out of type checking", ("comment",)),
     ("ts-ignore", "MINOR", re.compile(r"//\s*@ts-ignore\b"),
-     "`@ts-ignore` hides the error even after it is fixed", ()),
+     "`@ts-ignore` hides the error even after it is fixed", ("comment",)),
     ("ts-expect-error-bare", "NIT", re.compile(r"//\s*@ts-expect-error\s*$"),
-     "`@ts-expect-error` without an explanation", ()),
+     "`@ts-expect-error` without an explanation", ("comment",)),
     ("any-type", "MINOR", re.compile(r"(?::\s*any\b|\bas\s+any\b|<any>)"),
      "`any` disables checking at this seam", ()),
     ("loose-equality", "MINOR", re.compile(r"[^=!<>]==(?!=)\s*(?!null|undefined)"),
@@ -61,9 +61,9 @@ RULES = [
     ("stub-throw", "MINOR", re.compile(r"throw new Error\(\s*['\"](?:TODO|not implemented|unimplemented)", re.I),
      "stub shipped as if complete", ()),
     ("todo", "MINOR", re.compile(r"(?://|/\*)\s*(TODO|FIXME|XXX)"),
-     "unfinished marker left in code", ()),
+     "unfinished marker left in code", ("comment",)),
     ("eslint-disable-bare", "NIT", re.compile(r"eslint-disable(?!-next-line\s+\S|\s+\S)"),
-     "disable comment without a rule name", ()),
+     "disable comment without a rule name", ("comment",)),
     ("settimeout-string", "MINOR", re.compile(r"setTimeout\(\s*['\"]"),
      "string argument to setTimeout is eval'd", ()),
     ("return-await", "NIT", re.compile(r"return\s+await\b"),
@@ -126,8 +126,9 @@ def scan(path: str) -> list[_lib.Finding]:
     for rule, severity, pattern, message, flags in RULES:
         if "notest" in flags and in_test:
             continue
-        for match in pattern.finditer(source):
-            line = source.count("\n", 0, match.start()) + 1
+        haystack = source if "comment" in flags else cleaned
+        for match in pattern.finditer(haystack):
+            line = haystack.count("\n", 0, match.start()) + 1
             if "sig" in flags:
                 window = cleaned.splitlines()[line - 1 : line + 6]
                 if any("signal" in text or "AbortController" in text for text in window):

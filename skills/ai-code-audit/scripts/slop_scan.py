@@ -112,7 +112,9 @@ def tautological_assert(node, ctx):
 
 def bool_compare(node, ctx):
     if isinstance(node, ast.Compare):
-        for comp in node.comparators:
+        for op, comp in zip(node.ops, node.comparators):
+            if isinstance(op, (ast.Is, ast.IsNot)):
+                continue
             if is_true(comp) or is_none(comp):
                 word = "True" if is_true(comp) else "None"
                 return f"compares against `{word}` with == instead of `is`", "NIT"
@@ -154,20 +156,16 @@ def os_system(node, ctx):
 def open_without_encoding(node, ctx):
     if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
         if node.func.id == "open":
-            if not any(kw.arg in {"encoding", "mode"} and not _is_text_mode(kw.value) for kw in node.keywords):
-                has_encoding = any(kw.arg == "encoding" for kw in node.keywords)
-                binary = any(
-                    kw.arg == "mode" and isinstance(kw.value, ast.Constant)
-                    and "b" in str(kw.value.value)
-                    for kw in node.keywords
-                )
-                if not has_encoding and not binary:
-                    return "`open()` without `encoding=` depends on the host locale", "MINOR"
+            if any(kw.arg == "encoding" for kw in node.keywords):
+                return None
+            binary = any(
+                kw.arg == "mode" and isinstance(kw.value, ast.Constant)
+                and "b" in str(kw.value.value)
+                for kw in node.keywords
+            )
+            if not binary:
+                return "`open()` without `encoding=` depends on the host locale", "MINOR"
     return None
-
-
-def _is_text_mode(value) -> bool:
-    return isinstance(value, ast.Constant) and isinstance(value.value, str) and "t" in value.value
 
 
 def http_no_timeout(node, ctx):
@@ -248,8 +246,12 @@ def todo_comment(node, ctx):
 def raises_exception_in_test(node, ctx):
     if not ctx.in_test:
         return None
-    if isinstance(node, ast.Attribute) and node.attr == "raises":
-        return "`pytest.raises(Exception)` accepts any failure, including a typo", "MINOR"
+    if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+        if node.func.attr != "raises" or not node.args:
+            return None
+        caught = node.args[0]
+        if isinstance(caught, ast.Name) and caught.id in {"Exception", "BaseException"}:
+            return "`pytest.raises(Exception)` accepts any failure, including a typo", "MINOR"
     return None
 
 

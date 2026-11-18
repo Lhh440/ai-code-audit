@@ -70,8 +70,14 @@ def read(path: str) -> str:
 
 
 def strip_comments(source: str) -> str:
-    source = re.sub(r"/\*.*?\*/", "", source, flags=re.S)
-    return re.sub(r"(?m)^\s*//.*$", "", source)
+    """Blank comments but keep newlines, so line numbers stay aligned."""
+    source = re.sub(
+        r"/\*.*?\*/",
+        lambda match: re.sub(r"[^\n]", " ", match.group(0)),
+        source,
+        flags=re.S,
+    )
+    return re.sub(r"(?m)^\s*//.*$", lambda match: " " * len(match.group(0)), source)
 
 
 def imports(source: str) -> list[tuple[int, str, str | None]]:

@@ -29,14 +29,17 @@ Nothing writes outside the audited repo except `/tmp`.
 
 ## The one risky step
 
-`test_credibility.sh --revert` performs `git stash push` on changed non-test
-files, runs `pytest`, then `git stash pop`. Consequences:
+`test_credibility.sh` performs `git stash push` on changed non-test files, runs
+the changed tests with the language's own runner (`pytest`, a local `vitest` or
+`jest`, `go test`, or `cargo test`), then `git stash pop`. Consequences:
 
 - Uncommitted work in those files is stashed for the duration. If the shell is
   killed mid-run, `git stash list` still holds it.
 - It runs your test suite, which may itself touch the filesystem, network, or a
-  database.
+  database. For Go and Rust the toolchains may fetch modules or crates.
 - Use `--no-revert` to keep it to the read-only pattern scan.
+- Rust inline `#[cfg(test)]` modules live in the reverted source files, so only
+  integration tests under `tests/` can be used for the revert-check.
 
 Run it on a clean tree the first time.
 

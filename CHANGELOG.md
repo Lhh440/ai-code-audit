@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.4.0] - 2026-01-01
+
+- `test_credibility.sh`: TypeScript, Go and Rust support. Test files are
+  classified per language and run with the project's own runner; the
+  revert-check stashes only implementation files, then restores them.
+- `--help` on the static gates, `survey.sh` and `test_credibility.sh`, completing
+  the per-probe documentation promise
+- `static_gate.sh` resolves relative path arguments against `AUDIT_ROOT`
+  instead of the skill directory
+- slop scanners keep line numbers stable across block comments; TypeScript
+  structural rules now read comment-stripped source while comment rules read
+  the original
+- fix `bool-identity` flagging `x is None`; `raises-exception` flagging every
+  `pytest.raises`, and `open(..., "r")` slipping past `open-without-encoding`
+- regression coverage for the three false positives in `clean-unusual`
+- drop the stray empty `hi` file
+
 ## [0.3.1] - 2026-01-01
 
 - `--help` on every probe: what it reads, writes, and flags

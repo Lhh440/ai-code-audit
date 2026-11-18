@@ -4,6 +4,18 @@
 set -euo pipefail
 ORIG="$(pwd)"
 cd "$(dirname "$0")/.."
+
+USAGE='Rank changed files by review risk. Read-only.
+
+usage: survey.sh [-h] [base-ref]
+
+base-ref defaults to origin/main, origin/master, main, master or HEAD~1.
+Without git history it lists the tree instead.
+
+Reads: git history, changed file names and sizes.
+Writes: a file list under /tmp (path printed at the end).
+Exit: 0 even when there is nothing to rank.'
+for a in "$@"; do case "$a" in -h|--help) printf '%s\n' "$USAGE"; exit 0 ;; esac; done
 ROOT="${AUDIT_ROOT:-$(git -C "$ORIG" rev-parse --show-toplevel 2>/dev/null || echo "$ORIG")}"
 export AUDIT_ROOT="$ROOT"
 

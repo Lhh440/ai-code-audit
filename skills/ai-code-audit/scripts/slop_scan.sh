@@ -10,9 +10,9 @@ for a in "$@"; do case "$a" in -*) ARGS+=("$a") ;; /*) ARGS+=("$a") ;; *) ARGS+=
 for a in "$@"; do case "$a" in -h|--help) exec python3 "scripts/slop_scan.py" --help ;; esac; done
 
 if command -v ast-grep >/dev/null; then
-  ROOT="${AUDIT_ROOT:-$(pwd)}"
+  if [ "${#ARGS[@]}" -gt 0 ]; then TARGETS=("${ARGS[@]}"); else TARGETS=("${AUDIT_ROOT:-$(pwd)}"); fi
   echo "== ast-grep (rules/ai-slop.yml) =="
-  ast-grep scan --config rules/ai-slop.yml "$ROOT" || true
+  ast-grep scan --config rules/ai-slop.yml "${TARGETS[@]}" || true
   echo
   echo "note: ast-grep covers shape rules; the AST fallback covers semantics. Run both if unsure."
   exit 0

@@ -45,7 +45,7 @@ scripts/slop_scan.sh         # ai-slop rules; ast-grep if installed, else AST fa
 scripts/check_imports_ts.sh  # unresolvable modules, undeclared or uninstalled packages
 scripts/probe_api_ts.sh      # imported names the module never exports
 scripts/static_gate_ts.sh    # tsc --noEmit / eslint, non-mutating
-scripts/test_credibility.sh  # same revert-check as Python
+scripts/test_credibility.sh  # same revert-check; uses a local vitest or jest
 scripts/slop_scan_ts.sh      # regex rules; ast-grep rules/ai-slop-ts.yml when installed
 ```
 
@@ -55,6 +55,7 @@ scripts/slop_scan_ts.sh      # regex rules; ast-grep rules/ai-slop-ts.yml when i
 scripts/check_imports_go.sh  # unresolvable import paths, missing requires
 scripts/probe_api_go.sh      # undefined and unexported selectors on local packages
 scripts/static_gate_go.sh    # gofmt -l / go vet, non-mutating
+scripts/test_credibility.sh  # skip markers, deleted asserts, and the revert-check
 scripts/slop_scan_go.sh      # regex rules; ast-grep rules/ai-slop-go.yml when installed
 ```
 
@@ -64,6 +65,7 @@ scripts/slop_scan_go.sh      # regex rules; ast-grep rules/ai-slop-go.yml when i
 scripts/check_imports_rust.sh  # unresolvable use paths, undeclared crates
 scripts/probe_api_rust.sh      # imported items never declared, or not `pub`
 scripts/static_gate_rust.sh    # cargo fmt --check / cargo check
+scripts/test_credibility.sh    # integration tests under tests/ only
 scripts/slop_scan_rust.sh      # regex rules; ast-grep rules/ai-slop-rust.yml when installed
 ```
 

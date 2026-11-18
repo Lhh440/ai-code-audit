@@ -60,7 +60,7 @@ Directories are discovered, or set `AUDIT_FILES` / pass paths explicitly.
 | `check_imports.sh` | unresolvable modules, undeclared dependencies |
 | `probe_api.sh` | imported symbols that do not exist, keyword args the function never accepted |
 | `static_gate.sh` | `py_compile`, `ruff`, `mypy` — never mutating |
-| `test_credibility.sh` | skip markers, deleted asserts, and the revert-check |
+| `test_credibility.sh` | skip markers, deleted asserts, and the revert-check — pytest, vitest/jest, go test or cargo test |
 | `slop_scan.sh` | 17 Python AST + 3 line rules; ast-grep when installed |
 | `check_imports_ts.sh` / `probe_api_ts.sh` | unresolvable modules; imported names the module never exports |
 | `static_gate_ts.sh` | `tsc --noEmit`, `eslint` — never mutating |
@@ -74,16 +74,18 @@ Directories are discovered, or set `AUDIT_FILES` / pass paths explicitly.
 
 Everything is stdlib Python 3.9+. No install step, no dependencies. Missing
 tools degrade to `skipped:`, which the report must carry forward — a skipped
-step is not a pass.
+step is not a pass. The credibility probe also skips a language when its test
+runner is absent instead of guessing.
 
 ## Every probe documents itself
 
 ```bash
 skills/ai-code-audit/scripts/probe_api_rust.sh --help
+skills/ai-code-audit/scripts/test_credibility.sh --help
 ```
 
-Each one states what it reads, what it writes, what it costs, and its rule
-severities — before you run it, not in a wiki. Writes and the one risky step are
+Each probe, gate and the survey states what it reads, what it writes, what it
+costs, and its rule severities — before you run it, not in a wiki. Writes and the one risky step are
 enumerated in [SECURITY.md](SECURITY.md).
 
 ## Design rules
