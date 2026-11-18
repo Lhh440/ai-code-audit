@@ -18,6 +18,19 @@ import _lib  # noqa: E402
 SELECTOR = re.compile(r"(?<![\w.])([a-z]\w*)\.([A-Za-z_]\w*)")
 
 
+USAGE = """
+Undefined and unexported selectors on local Go packages.
+
+usage: probe-api-go [-h] [paths...]
+
+Without paths, scans $AUDIT_ROOT (default: the directory the wrapper was run in).
+
+Reads: local packages. Writes: nothing.
+Findings: undefined-symbol BLOCKER, unexported-selector MAJOR.
+
+Exit: 0 even with findings; findings go to stdout as JSON lines.
+"""
+
 def aliases(path: str) -> dict[str, str]:
     """alias -> resolved package directory for local packages only."""
     out: dict[str, str] = {}
@@ -72,6 +85,7 @@ def _declared_lowercase(directory: str, symbol: str) -> bool:
 
 
 def main(argv: list[str]) -> int:
+    _lib.usage(argv, USAGE)
     files = argv or _golib.go_files()
     if not files:
         _lib.skipped("probe_api_go", "no Go files")

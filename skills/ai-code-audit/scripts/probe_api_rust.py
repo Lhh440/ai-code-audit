@@ -14,6 +14,19 @@ import _lib  # noqa: E402
 import _rustlib  # noqa: E402
 
 
+USAGE = """
+Imported items never declared, or declared without `pub`.
+
+usage: probe-api-rust [-h] [paths...]
+
+Without paths, scans $AUDIT_ROOT (default: the directory the wrapper was run in).
+
+Reads: local modules. Writes: nothing.
+Findings: undefined-import BLOCKER, private-import MAJOR.
+
+Exit: 0 even with findings; findings go to stdout as JSON lines.
+"""
+
 def check_file(path: str) -> list[_lib.Finding]:
     findings: list[_lib.Finding] = []
     source = _rustlib.strip_comments(_rustlib.read(path))
@@ -75,6 +88,7 @@ def report(findings, path, line, target, name, known, is_pub, evidence) -> None:
 
 
 def main(argv: list[str]) -> int:
+    _lib.usage(argv, USAGE)
     files = argv or _rustlib.rust_files()
     if not files:
         _lib.skipped("probe_api_rust", "no Rust files")

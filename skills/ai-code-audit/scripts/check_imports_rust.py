@@ -14,6 +14,19 @@ import _lib  # noqa: E402
 import _rustlib  # noqa: E402
 
 
+USAGE = """
+`use` path and crate resolution for Rust.
+
+usage: check-imports-rust [-h] [paths...]
+
+Without paths, scans $AUDIT_ROOT (default: the directory the wrapper was run in).
+
+Reads: .rs files and Cargo.toml. Writes: nothing.
+Findings: unresolvable-crate/-module BLOCKER, undeclared-crate BLOCKER.
+
+Exit: 0 even with findings; findings go to stdout as JSON lines.
+"""
+
 def segments_of(path_text: str) -> list[str]:
     """Path segments only; a braced group resolves against the prefix."""
     cleaned = path_text.split("{")[0] if "{" in path_text else path_text
@@ -70,6 +83,7 @@ def check_file(path: str, crates: set[str]) -> list[_lib.Finding]:
 
 
 def main(argv: list[str]) -> int:
+    _lib.usage(argv, USAGE)
     files = argv or _rustlib.rust_files()
     if not files:
         _lib.skipped("check_imports_rust", "no Rust files")

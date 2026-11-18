@@ -14,6 +14,19 @@ import _golib  # noqa: E402
 import _lib  # noqa: E402
 
 
+USAGE = """
+Import resolution for Go against go.mod.
+
+usage: check-imports-go [-h] [paths...]
+
+Without paths, scans $AUDIT_ROOT (default: the directory the wrapper was run in).
+
+Reads: .go files and go.mod. Writes: nothing.
+Findings: unresolvable-import BLOCKER, unvendored-dependency NIT.
+
+Exit: 0 even with findings; findings go to stdout as JSON lines.
+"""
+
 def check_file(path: str, required: set[str]) -> list[_lib.Finding]:
     findings: list[_lib.Finding] = []
     module = _golib.module_path()
@@ -42,6 +55,7 @@ def check_file(path: str, required: set[str]) -> list[_lib.Finding]:
 
 
 def main(argv: list[str]) -> int:
+    _lib.usage(argv, USAGE)
     files = argv or _golib.go_files()
     if not files:
         _lib.skipped("check_imports_go", "no Go files")

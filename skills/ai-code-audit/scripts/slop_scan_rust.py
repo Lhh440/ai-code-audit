@@ -68,6 +68,19 @@ RULES = [
 MAX_LINES = 200
 
 
+USAGE = """
+Regex rules for AI-slop tells in Rust.
+
+usage: slop-scan-rust [-h] [paths...]
+
+Without paths, scans $AUDIT_ROOT (default: the directory the wrapper was run in).
+
+Reads: .rs files. Writes: nothing.
+Findings: 21 regex rules; clippy covers most of this when installed.
+
+Exit: 0 even with findings; findings go to stdout as JSON lines.
+"""
+
 def near_miss(source: str, path: str) -> list[_lib.Finding]:
     findings: list[_lib.Finding] = []
     bodies = _rustlib.funcs(source)
@@ -147,6 +160,7 @@ def scan(path: str) -> list[_lib.Finding]:
 
 
 def main(argv: list[str]) -> int:
+    _lib.usage(argv, USAGE)
     files = argv or _rustlib.rust_files()
     findings: list[_lib.Finding] = []
     for path in files:

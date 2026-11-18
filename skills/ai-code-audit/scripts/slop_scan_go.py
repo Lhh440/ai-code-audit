@@ -68,6 +68,19 @@ RULES = [
 MAX_LINES = 200
 
 
+USAGE = """
+Regex rules for AI-slop tells in Go.
+
+usage: slop-scan-go [-h] [paths...]
+
+Without paths, scans $AUDIT_ROOT (default: the directory the wrapper was run in).
+
+Reads: .go files. Writes: nothing.
+Findings: 21 regex rules; `discarded-error` is low confidence by nature.
+
+Exit: 0 even with findings; findings go to stdout as JSON lines.
+"""
+
 def near_miss(source: str, path: str) -> list[_lib.Finding]:
     findings: list[_lib.Finding] = []
     bodies = _golib.funcs(source)
@@ -162,6 +175,7 @@ def scan(path: str) -> list[_lib.Finding]:
 
 
 def main(argv: list[str]) -> int:
+    _lib.usage(argv, USAGE)
     files = argv or _golib.go_files()
     findings: list[_lib.Finding] = []
     for path in files:

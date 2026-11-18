@@ -76,6 +76,16 @@ Everything is stdlib Python 3.9+. No install step, no dependencies. Missing
 tools degrade to `skipped:`, which the report must carry forward — a skipped
 step is not a pass.
 
+## Every probe documents itself
+
+```bash
+skills/ai-code-audit/scripts/probe_api_rust.sh --help
+```
+
+Each one states what it reads, what it writes, what it costs, and its rule
+severities — before you run it, not in a wiki. Writes and the one risky step are
+enumerated in [SECURITY.md](SECURITY.md).
+
 ## Design rules
 
 - **Read-only by default.** Fixes only on request, only after the report.
@@ -115,6 +125,12 @@ unresolvable modules, and exported-name mismatches — the places the compiler i
 told to look away.
 
 Not in scope: formatting, naming, architecture review, auto-fix.
+
+## Security
+
+Read [SECURITY.md](SECURITY.md) before the first run. Short version: stdlib
+Python plus shell, no dependencies, no network, and exactly one script that
+touches the git worktree (`test_credibility.sh`).
 
 ## License
 

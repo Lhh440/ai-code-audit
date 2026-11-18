@@ -24,6 +24,20 @@ NAMESPACE = re.compile(r"""import\s+\*\s+as\s+(\w+)\s+from\s*['"]([^'"]+)['"]"""
 STAR_REEXPORT = re.compile(r"""export\s+\*\s+from\s+['"]""")
 
 
+USAGE = """
+Imported names a local module never exports.
+
+usage: probe-api-ts [-h] [paths...]
+
+Without paths, scans $AUDIT_ROOT (default: the directory the wrapper was run in).
+
+Reads: local modules and the files given. Writes: nothing.
+`export *` makes the surface unknown and is skipped rather than guessed.
+Findings: hallucinated-export / missing-default-export BLOCKER.
+
+Exit: 0 even with findings; findings go to stdout as JSON lines.
+"""
+
 def surface(path: str) -> tuple[set[str], bool, bool]:
     """(exported names, has default, has export *)"""
     source = _tslib.read(path)
@@ -115,6 +129,7 @@ def check_file(path: str, cache: dict[str, tuple[set[str], bool, bool]]) -> list
 
 
 def main(argv: list[str]) -> int:
+    _lib.usage(argv, USAGE)
     files = argv or _tslib.ts_files()
     if not files:
         _lib.skipped("probe_api_ts", "no TypeScript files")

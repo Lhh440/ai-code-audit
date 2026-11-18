@@ -31,6 +31,19 @@ class Ctx:
         self.in_test = False
 
 
+USAGE = """
+AST rules for AI-slop tells in Python.
+
+usage: slop-scan [-h] [paths...]
+
+Without paths, scans $AUDIT_ROOT (default: the directory the wrapper was run in).
+
+Reads: .py files. Writes: nothing.
+Findings: 17 AST + 3 line rules, mostly MINOR/NIT; blank_ok on GIL-free claims.
+
+Exit: 0 even with findings; findings go to stdout as JSON lines.
+"""
+
 def walk(tree: ast.AST):
     return ast.walk(tree)
 
@@ -377,6 +390,7 @@ def _snippet(source: str, lineno: int) -> str:
 
 
 def main(argv: list[str]) -> int:
+    _lib.usage(argv, USAGE)
     files = argv or _lib.target_files()
     findings: list[_lib.Finding] = []
     for path in files:

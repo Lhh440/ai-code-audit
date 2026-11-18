@@ -5,7 +5,9 @@ ORIG="$(pwd)"
 cd "$(dirname "$0")/.."
 export AUDIT_ROOT="${AUDIT_ROOT:-$ORIG}"
 ARGS=()
-for a in "$@"; do case "$a" in /*) ARGS+=("$a") ;; *) ARGS+=("$AUDIT_ROOT/$a") ;; esac; done
+for a in "$@"; do case "$a" in -*) ARGS+=("$a") ;; /*) ARGS+=("$a") ;; *) ARGS+=("$AUDIT_ROOT/$a") ;; esac; done
+for a in "$@"; do case "$a" in -h|--help) exec python3 "scripts/slop_scan_ts.py" --help ;; esac; done
+
 if command -v ast-grep >/dev/null; then
   echo "== ast-grep (rules/ai-slop-ts.yml) =="
   ast-grep scan --config rules/ai-slop-ts.yml "$AUDIT_ROOT" || true

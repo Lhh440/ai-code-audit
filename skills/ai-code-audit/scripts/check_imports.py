@@ -36,6 +36,20 @@ TEST_ONLY = {"pytest", "hypothesis", "freezegun", "responses", "faker", "mypy", 
 PYPROJECT = ("pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", "requirements-dev.txt")
 
 
+USAGE = """
+Import resolution: unresolvable modules and undeclared dependencies.
+
+usage: check-imports [-h] [paths...]
+
+Without paths, scans $AUDIT_ROOT (default: the directory the wrapper was run in).
+
+Reads: every .py under $AUDIT_ROOT (or the paths given).
+Writes: nothing. Shells out: no.
+Findings: unresolvable-import MAJOR, undeclared-dependency MINOR.
+
+Exit: 0 even with findings; findings go to stdout as JSON lines.
+"""
+
 def stdlib_names() -> set[str]:
     return set(getattr(sys, "stdlib_module_names", STDLIB_FALLBACK))
 
@@ -161,6 +175,7 @@ def check_file(path: str, stdlib: set[str], installed: set[str], declared: set[s
 
 
 def main(argv: list[str]) -> int:
+    _lib.usage(argv, USAGE)
     files = argv or _lib.target_files()
     if not files:
         _lib.skipped("check_imports", "no Python files")

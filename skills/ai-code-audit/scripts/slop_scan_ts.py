@@ -75,6 +75,19 @@ RULES = [
 MAX_LINES = 200
 
 
+USAGE = """
+Regex rules for AI-slop tells in TypeScript.
+
+usage: slop-scan-ts [-h] [paths...]
+
+Without paths, scans $AUDIT_ROOT (default: the directory the wrapper was run in).
+
+Reads: .ts/.tsx files. Writes: nothing.
+Findings: 23 regex rules; `fetch-no-signal` is a 6-line window heuristic.
+
+Exit: 0 even with findings; findings go to stdout as JSON lines.
+"""
+
 def near_miss(source: str, path: str) -> list[_lib.Finding]:
     findings: list[_lib.Finding] = []
     bodies = _tslib.function_bodies(source)
@@ -153,6 +166,7 @@ def scan(path: str) -> list[_lib.Finding]:
 
 
 def main(argv: list[str]) -> int:
+    _lib.usage(argv, USAGE)
     files = argv or _tslib.ts_files()
     findings: list[_lib.Finding] = []
     for path in files:

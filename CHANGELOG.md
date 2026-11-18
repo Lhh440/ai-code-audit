@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.1] - 2026-01-01
+
+- `--help` on every probe: what it reads, writes, and flags
+- `SECURITY.md`: full write surface, the worktree risk, sandboxing notes
+- wrappers no longer mangle `-` arguments into paths
+
 ## [0.3.0] - 2026-01-01
 
 Go and Rust support.

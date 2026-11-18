@@ -15,6 +15,19 @@ import _lib  # noqa: E402
 import _tslib  # noqa: E402
 
 
+USAGE = """
+Import resolution for TypeScript: unresolvable specs, undeclared packages.
+
+usage: check-imports-ts [-h] [paths...]
+
+Without paths, scans $AUDIT_ROOT (default: the directory the wrapper was run in).
+
+Reads: .ts/.tsx/.js files and package.json. Writes: nothing.
+Findings: unresolvable-import BLOCKER, missing-dependency MAJOR, undeclared-dependency MINOR.
+
+Exit: 0 even with findings; findings go to stdout as JSON lines.
+"""
+
 def check_file(path: str, declared: set[str]) -> list[_lib.Finding]:
     findings: list[_lib.Finding] = []
     source = _tslib.strip_comments(_tslib.read(path))
@@ -62,6 +75,7 @@ def check_file(path: str, declared: set[str]) -> list[_lib.Finding]:
 
 
 def main(argv: list[str]) -> int:
+    _lib.usage(argv, USAGE)
     files = argv or _tslib.ts_files()
     if not files:
         _lib.skipped("check_imports_ts", "no TypeScript files")

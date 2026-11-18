@@ -54,6 +54,17 @@ def rel(path: str, base: str | None = None) -> str:
         return path
 
 
+def usage(argv: list[str], text: str) -> None:
+    """Print usage and exit when -h/--help is asked for.
+
+    Every probe is meant to be readable before it is trusted: the help text
+    states what is read, what is written, and what it costs.
+    """
+    if any(arg in ("-h", "--help", "help") for arg in argv):
+        print(text.strip())
+        raise SystemExit(0)
+
+
 def skipped(name: str, reason: str) -> None:
     print(f"skipped: {name} ({reason})", file=sys.stderr)
 

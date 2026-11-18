@@ -32,6 +32,20 @@ class ModuleDefs:
         return self.signatures.get(func)
 
 
+USAGE = """
+Hallucinated symbols and keyword arguments against local modules.
+
+usage: probe-api [-h] [paths...]
+
+Without paths, scans $AUDIT_ROOT (default: the directory the wrapper was run in).
+
+Reads: local .py modules plus the files given.
+Writes: nothing. Shells out: no.
+Findings: hallucinated-symbol/-attribute/-module BLOCKER, unsupported-keyword MAJOR.
+
+Exit: 0 even with findings; findings go to stdout as JSON lines.
+"""
+
 def local_modules() -> dict[str, ModuleDefs]:
     """Map dotted module paths to their definitions for files under the root."""
     base = _lib.root()
@@ -266,6 +280,7 @@ def match_call(
 
 
 def main(argv: list[str]) -> int:
+    _lib.usage(argv, USAGE)
     modules = local_modules()
     if not modules:
         _lib.skipped("probe_api", "no local modules")
