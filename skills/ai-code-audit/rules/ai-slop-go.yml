@@ -1,0 +1,49 @@
+# ast-grep rules: AI-slop shapes in Go.
+id: ai-slop-go
+language: Go
+rule:
+  any:
+    - id: empty-err-check
+      pattern: |
+        if err != nil {
+        }
+      message: error checked then ignored
+      severity: error
+
+    - id: nil-err-return
+      pattern: |
+        if err != nil {
+          return nil
+        }
+      message: returns nil instead of the error
+      severity: error
+
+    - id: http-default-client
+      pattern: http.$METHOD($URL)
+      message: package-level http call has no timeout
+      severity: error
+
+    - id: panic-lib
+      pattern: panic($$$ARGS)
+      message: panic in library code
+      severity: warning
+
+    - id: context-background
+      pattern: context.Background()
+      message: loses caller cancellation
+      severity: warning
+
+    - id: time-sleep
+      pattern: time.Sleep($D)
+      message: untestable without a clock seam
+      severity: warning
+
+    - id: blank-err
+      pattern: _ = $ERR
+      message: error assigned to blank
+      severity: warning
+
+    - id: fmt-println
+      pattern: fmt.Println($$$ARGS)
+      message: fmt.Println in library code
+      severity: info

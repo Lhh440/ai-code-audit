@@ -1,0 +1,67 @@
+# ast-grep rules: AI-slop shapes in Python.
+# Only used when ast-grep is installed; slop_scan.sh falls back to the AST scanner.
+# severity: error = will bite, warning = real, info = nit
+id: ai-slop
+language: Python
+rule:
+  any:
+    - id: bare-except
+      pattern: |
+        try:
+          $$$BODY
+        except:
+          $$$HANDLER
+      message: bare except swallows KeyboardInterrupt and SystemExit
+      severity: error
+
+    - id: except-pass
+      pattern: |
+        except $EXC:
+          pass
+      message: exception swallowed silently
+      severity: error
+
+    - id: shell-true
+      pattern: subprocess.$FN($$$ARGS, shell=True)
+      message: shell=True with an interpolated command allows injection
+      severity: warning
+
+    - id: eval-call
+      pattern: eval($ARG)
+      message: eval on a non-literal
+      severity: warning
+
+    - id: mutable-default
+      pattern: |
+        def $F($$$PARAMS, $NAME=[], $$$REST):
+          $$$BODY
+      message: mutable default argument shared across calls
+      severity: warning
+
+    - id: assert-true
+      pattern: assert True
+      message: always green
+      severity: info
+
+    - id: open-no-encoding
+      pattern: open($PATH)
+      message: open() without encoding depends on host locale
+      severity: info
+
+    - id: requests-no-timeout
+      pattern: requests.$METHOD($$$ARGS)
+      not:
+        has:
+          pattern: timeout=$T
+      message: HTTP call without timeout
+      severity: warning
+
+    - id: yaml-load
+      pattern: yaml.load($DOC)
+      message: yaml.load without SafeLoader
+      severity: warning
+
+    - id: utcnow
+      pattern: datetime.utcnow()
+      message: naive datetime
+      severity: info

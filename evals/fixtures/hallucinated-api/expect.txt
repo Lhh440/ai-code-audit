@@ -1,0 +1,4 @@
+hallucinated-symbol
+hallucinated-attribute
+hallucinated-module
+unsupported-keyword

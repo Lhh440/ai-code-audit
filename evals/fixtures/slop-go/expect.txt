@@ -1,0 +1,7 @@
+http-default-client
+discarded-error
+empty-err-check
+context-background
+blank-err-assign
+defer-in-loop
+stub-panic

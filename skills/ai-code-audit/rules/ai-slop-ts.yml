@@ -1,0 +1,51 @@
+# ast-grep rules: AI-slop shapes in TypeScript.
+# Only used when ast-grep is installed; slop_scan_ts.sh falls back to regexes.
+id: ai-slop-ts
+language: TypeScript
+rule:
+  any:
+    - id: any-cast
+      pattern: $X as any
+      message: cast to any disables checking at this seam
+      severity: warning
+
+    - id: empty-catch
+      pattern: |
+        try { $$$T } catch ($E) { }
+      message: exception swallowed
+      severity: error
+
+    - id: innerhtml
+      pattern: $EL.innerHTML = $HTML
+      message: innerHTML parses untrusted markup
+      severity: error
+
+    - id: eval
+      pattern: eval($CODE)
+      message: eval on a non-literal
+      severity: warning
+
+    - id: nonnull-env
+      pattern: process.env.$NAME!
+      message: non-null assertion on an environment variable
+      severity: warning
+
+    - id: sort-no-comparator
+      pattern: $ARR.sort()
+      message: default sort is lexicographic
+      severity: warning
+
+    - id: ts-ignore
+      pattern: // @ts-ignore
+      message: ts-ignore survives the fix
+      severity: info
+
+    - id: stub-throw
+      pattern: throw new Error("TODO")
+      message: stub shipped as complete
+      severity: warning
+
+    - id: console-log
+      pattern: console.log($$$ARGS)
+      message: console.log left in place
+      severity: info

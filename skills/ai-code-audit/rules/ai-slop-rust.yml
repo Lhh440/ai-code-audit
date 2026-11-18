@@ -1,0 +1,44 @@
+# ast-grep rules: AI-slop shapes in Rust.
+id: ai-slop-rust
+language: Rust
+rule:
+  any:
+    - id: todo-macro
+      pattern: todo!()
+      message: stub shipped as complete
+      severity: error
+
+    - id: unimplemented-macro
+      pattern: unimplemented!()
+      message: stub shipped as complete
+      severity: error
+
+    - id: unwrap-call
+      pattern: $X.unwrap()
+      message: unwrap panics with no context
+      severity: warning
+
+    - id: empty-expect
+      pattern: $X.expect("")
+      message: expect with an empty message
+      severity: warning
+
+    - id: discarded-result
+      pattern: let _ = $X;
+      message: must_use value dropped
+      severity: warning
+
+    - id: ignore-attr
+      pattern: "#[ignore]"
+      message: test does not run in CI
+      severity: warning
+
+    - id: empty-match-arm
+      pattern: "_ => {}"
+      message: catch-all arm does nothing
+      severity: warning
+
+    - id: process-exit
+      pattern: std::process::exit($CODE)
+      message: destructors are skipped
+      severity: error
