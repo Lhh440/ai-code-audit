@@ -1,0 +1,61 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  evals:
+    name: fixtures
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: run eval harness
+        run: ./evals/run.sh
+      - name: self-scan (informational)
+        run: |
+          skills/ai-code-audit/scripts/slop_scan.sh skills/ai-code-audit/scripts/*.py || true
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: ruff
+        run: |
+          pip install ruff
+          ruff check skills/ai-code-audit/scripts
+      - name: py_compile
+        run: python3 -m py_compile skills/ai-code-audit/scripts/*.py
+      - name: shellcheck
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y shellcheck
+          shellcheck skills/ai-code-audit/scripts/*.sh evals/run.sh
+
+  gates:
+    name: compiler gates
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - name: go gate on clean fixture
+        run: |
+          AUDIT_ROOT="$PWD/evals/fixtures/clean-go" skills/ai-code-audit/scripts/static_gate_go.sh
+      - name: rust gate on clean fixture
+        run: |
+          AUDIT_ROOT="$PWD/evals/fixtures/clean-rust" skills/ai-code-audit/scripts/static_gate_rust.sh
